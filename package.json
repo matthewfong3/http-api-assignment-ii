@@ -1,0 +1,30 @@
+{
+  "name": "http-api-assignment-ii",
+  "version": "1.0.0",
+  "engines": {
+    "node": "8.4.0",
+    "npm": "5.3.0"
+  },
+  "description": "http api assignment 2",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "echo \"Tests Complete\"",
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthewfong3/http-api-assignment-ii.git"
+  },
+  "author": "Matthew Fong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matthewfong3/http-api-assignment-ii/issues"
+  },
+  "homepage": "https://github.com/matthewfong3/http-api-assignment-ii#readme",
+  "devDependencies": {
+    "eslint": "^4.7.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0"
+  }
+}

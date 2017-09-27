@@ -6,7 +6,134 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+    "use strict";
+    
+    const parseJSON = (xhr, content) => {
+      // parse response 
+      console.log(xhr.response);  
+      const obj = JSON.parse(xhr.response);
+      if(obj.msg){
+        const p = document.createElement('p');
+        p.textContent = `Message: ${obj.msg}`;
+        content.appendChild(p);
+      }
+      
+      if(obj.users){
+        const userList = document.createElement('p');
+        const users = JSON.stringify(obj.users);
+        userList.innerHTML = users;
+        content.appendChild(userList);
+      }
+    };
 
+    const handleResponse = (xhr, parseResponse) => {
+      const content = document.querySelector('#content');
+      
+      // check status code
+      switch(xhr.status){
+          // do NOT parse JSON responses for 304 and HEAD requests
+        case 200:
+          content.innerHTML = '<b>Success</b>';
+          // check to see if it's a GET or HEAD before parsing JSON
+          if(parseResponse) parseJSON(xhr, content);
+          break;
+        case 201:
+          content.innerHTML = '<b>Created</b>';
+          parseJSON(xhr, content);
+          break;
+        case 204:
+          content.innerHTML = '<b>Updated (No Content)</b>';
+          // do NOT parse JSON response
+          break;
+        case 304:
+          content.innerHTML = '<b>Success</b>';
+          // do NOT parse JSON response
+          break;
+        case 400:
+          content.innerHTML = '<b>Bad Request</b>';
+          parseJSON(xhr, content);
+          break;
+        default: // handles 404 errors messages as default
+          content.innerHTML = '<b>Resource Not Found</b>';
+          if(parseResponse) parseJSON(xhr, content);
+          break;
+      }
+    };
+
+    const sendPost = (e, nameForm) => {
+      // grab the forms action (url to go to)
+      // and method (HTTP method - POST)
+      const nameAction = nameForm.getAttribute('action');
+      
+      const nameMethod = nameForm.getAttribute('method');
+      
+      // grab the form's name and age fields so we can check user input
+      const nameField = nameForm.querySelector('#nameField');
+      
+      const ageField = nameForm.querySelector('#ageField');
+      
+      // create a new Ajax request
+      const xhr = new XMLHttpRequest();
+      // set the method (POST) and url (action from the form)
+      xhr.open(nameMethod, nameAction);
+      
+      // set our request type to x-www-form-urlencoded
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      // set our requested response type for JSON response
+      xhr.setRequestHeader('Accept', 'application/json');
+      
+      // set our function to handle the response
+      xhr.onload = () => handleResponse(xhr);
+      
+      // build our x-www-form-urlencoded format
+      const formData = `name=${nameField.value}&age=${ageField.value}`;
+      
+      // send our request with the data
+      xhr.send(formData);
+      
+      // prevent browser's default to send the form and try to change pages on us
+      e.preventDefault();
+      return false;
+    };
+
+    const sendGet = (e, userForm) => {
+      const userAction = userForm.getAttribute('action');
+      
+      const userMethod = userForm.getAttribute('method');
+      
+      const url = userForm.querySelector('#urlField').value;
+      
+      const method = userForm.querySelector('#methodSelect').value;
+      
+      const xhr = new XMLHttpRequest();
+      
+      xhr.open(method, url);
+      
+      xhr.setRequestHeader('Accept', 'application/json');
+      
+      xhr.onload = () => handleResponse(xhr, (method === 'get'));
+      
+      xhr.send();
+      
+      e.preventDefault();
+      return false;
+    };
+
+    const init = () => {
+      const nameForm = document.querySelector('#nameForm');
+      
+      const userForm = document.querySelector('#userForm');
+      
+      const addUser = (e) => sendPost(e, nameForm);
+      
+      nameForm.addEventListener('submit', addUser);
+      
+      const getUser = (e) => sendGet(e, userForm);
+      
+      userForm.addEventListener('submit', getUser);
+    };
+
+    window.onload = init;
   </script>
 </head>
 <body>
